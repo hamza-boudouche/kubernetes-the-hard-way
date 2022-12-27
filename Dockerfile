@@ -10,6 +10,8 @@ ENV TERRAFORM_VERSION=1.3.4 \
 ENV GCLOUD_SDK_FILE=google-cloud-sdk-${GCLOUD_SDK_VERSION}-linux-x86_64.tar.gz \
     TERRAFORM_FILE=terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 
+RUN pip install Jinja2
+
 # download necessary files
 RUN apk update && \
     apk add bash curl git openssh-client gcc make musl-dev libffi-dev openssl-dev && \

@@ -1,0 +1,20 @@
+http {
+
+		{% for service, port in port_config.items() %}
+		upstream {{ service }} {
+				{% for worker in workers %}
+				server {{ worker }}:{{ port }};
+				{% endfor %}
+		}
+		{% endfor %}
+		
+		server {
+				{% for service, port in port_config.items() %}
+				location /{{ service }} {
+						proxy_pass http://{{ service }};
+				}
+				{% endfor %}
+		}
+}
+
+events { }

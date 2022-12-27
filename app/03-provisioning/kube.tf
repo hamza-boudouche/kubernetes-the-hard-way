@@ -1,3 +1,27 @@
+resource "google_compute_router" "router" {
+  name    = "router"
+  region  = "us-central1"
+  network = "${google_compute_network.default.name}"
+
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat" {
+  name                               = "nat"
+  router                             = google_compute_router.router.name
+  region                             = google_compute_router.router.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
+
 variable "gce_ssh_user" {
   default = "root"
 }
@@ -92,9 +116,9 @@ resource "google_compute_instance" "controller" {
     subnetwork = "${google_compute_subnetwork.default.name}"
     network_ip = "10.240.0.1${count.index}"
 
-    access_config {
-      // Ephemeral IP
-    }
+    # access_config {
+    #   // Ephemeral IP
+    # }
   }
   
   service_account {
@@ -132,6 +156,46 @@ resource "google_compute_instance" "worker" {
     subnetwork = "${google_compute_subnetwork.default.name}"
     network_ip = "10.240.0.2${count.index}"
 
+    # access_config {
+    #   // Ephemeral IP
+    # }
+  }
+  
+  service_account {
+    scopes = ["compute-rw","storage-ro","service-management","service-control","logging-write","monitoring"]
+  }
+
+  metadata = {
+    pod-cidr = "10.200.${count.index}.0/24"
+    sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
+  }
+
+  metadata_startup_script = "apt-get install -y python"
+}
+
+resource "google_compute_instance" "loadbalancer" {
+  name            = "loadbalancer"
+  machine_type    = "n1-standard-1"
+  zone            = "${var.gce_zone}"
+  can_ip_forward  = true
+
+  tags = ["kubernetes-the-easy-way","loadbalancer"]
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-1804-lts"
+    }
+  }
+
+  // Local SSD disk
+  scratch_disk {
+    interface = "SCSI"
+  }
+
+  network_interface {
+    subnetwork = "${google_compute_subnetwork.default.name}"
+    network_ip = "10.240.0.3"
+
     access_config {
       // Ephemeral IP
     }
@@ -142,7 +206,85 @@ resource "google_compute_instance" "worker" {
   }
 
   metadata = {
-    pod-cidr = "10.200.${count.index}.0/24"
+    sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
+  }
+
+  metadata_startup_script = "apt-get install -y python"
+}
+
+resource "google_compute_instance" "nfs" {
+  name            = "nfs"
+  machine_type    = "n1-standard-1"
+  zone            = "${var.gce_zone}"
+  can_ip_forward  = true
+
+  tags = ["kubernetes-the-easy-way","nfs"]
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-1804-lts"
+      size = 500
+    }
+  }
+
+  // Local SSD disk
+  scratch_disk {
+    interface = "SCSI"
+  }
+
+  network_interface {
+    subnetwork = "${google_compute_subnetwork.default.name}"
+    network_ip = "10.240.0.4"
+
+    # access_config {
+    #   // Ephemeral IP
+    # }
+  }
+  
+  service_account {
+    scopes = ["compute-rw","storage-ro","service-management","service-control","logging-write","monitoring"]
+  }
+
+  metadata = {
+    sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
+  }
+
+  metadata_startup_script = "apt-get install -y python"
+}
+
+resource "google_compute_instance" "bastion" {
+  name            = "bastion"
+  machine_type    = "n1-standard-1"
+  zone            = "${var.gce_zone}"
+  can_ip_forward  = true
+
+  tags = ["kubernetes-the-easy-way","bastion"]
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-1804-lts"
+    }
+  }
+
+  // Local SSD disk
+  scratch_disk {
+    interface = "SCSI"
+  }
+
+  network_interface {
+    subnetwork = "${google_compute_subnetwork.default.name}"
+    network_ip = "10.240.0.5"
+
+    access_config {
+      // Ephemeral IP
+    }
+  }
+  
+  service_account {
+    scopes = ["compute-rw","storage-ro","service-management","service-control","logging-write","monitoring"]
+  }
+
+  metadata = {
     sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
   }
 

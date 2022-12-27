@@ -14,6 +14,8 @@ terraform init
 
 terraform apply --auto-approve -var "gce_zone=${GCLOUD_ZONE}"
 
+scp -o StrictHostKeyChecking=no -i /root/.ssh/google_compute_engine /root/.ssh/google_compute_engine root@$(gcloud compute instances list --filter="(tags.items:bastion)" | grep -v NAME | awk '{ print $5 }'):/root/
+
 cd /root/app/04-certs
 ./gen-certs.sh
 
@@ -24,12 +26,13 @@ cd /root/app/06-encryption
 ./gen-encrypt.sh
 
 cd /root/app
-00-ansible/create-inventory.sh
+# 00-ansible/create-inventory.sh
+16-lb/create_private_inventory.sh
 
-ansible-playbook -i inventory.cfg 07-etcd/etcd-playbook.yml
+ansible-playbook -i private_inventory.ini 07-etcd/etcd-playbook.yml
 
-ansible-playbook -i inventory.cfg 08-kube-controller/kube-controller-playbook.yml
-ansible-playbook -i inventory.cfg 08-kube-controller/rbac-playbook.yml
+ansible-playbook -i private_inventory.ini 08-kube-controller/kube-controller-playbook.yml
+ansible-playbook -i private_inventory.ini 08-kube-controller/rbac-playbook.yml
 
 KUBERNETES_PUBLIC_ADDRESS=$(gcloud compute addresses describe kubernetes-the-easy-way \
   --region $(gcloud config get-value compute/region) \
@@ -51,10 +54,20 @@ gcloud compute forwarding-rules create kubernetes-forwarding-rule \
   --region $(gcloud config get-value compute/region) \
   --target-pool kubernetes-target-pool
 
-ansible-playbook -i inventory.cfg 09-kubelet/kubelet-playbook.yml
+ansible-playbook -i private_inventory.ini 09-kubelet/kubelet-playbook.yml
 
 ./10-kubectl/setup-kubectl.sh
 
 ./11-network/network-conf.sh
 
 ./12-kubedns/setup-kubedns.sh
+
+ansible-playbook -i private_inventory.ini 15-nfs/nfs-playbook.yml
+
+python 16-lb/render_conf.py > 16-lb/nginx.conf
+
+ansible-playbook -i private_inventory.ini 16-lb/lb-playbook.yml
+
+export nfs_server_ip=$(gcloud compute instances list --filter="(tags.items:nfs)" | grep -v NAME | awk '{ print $4 }')
+
+ansible-playbook -i private_inventory.ini 17-storageclass/storageclass-playbook.yml

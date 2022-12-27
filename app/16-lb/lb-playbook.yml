@@ -1,0 +1,29 @@
+- name: Install and configure Nginx as a load balancer
+  hosts: loadbalancer
+  become: yes
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    # - name: generate nginx conf from Jinja2 template
+    #   shell: python render_conf.py > nginx.conf
+    #   delegate_to: localhost
+    #   creates: nginx.conf
+
+    - name: Configure Nginx
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify:
+        - restart nginx
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted

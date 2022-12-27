@@ -1,0 +1,61 @@
+- name: setup the nfs server
+  hosts: nfs
+  become: yes
+  tasks:
+    - name: Install nfs-common
+      apt:
+        name: nfs-common
+        state: present
+
+    - name: Install nfs-kernel-server
+      apt:
+        name: nfs-kernel-server
+        state: present
+
+    - name: create shared folder
+      file:
+        path: /data/nfs1
+        state: directory
+
+    - name: change owner shared folder
+      shell: chown nobody:nogroup /data/nfs1
+
+    - name: change permissions of shared folder
+      shell: chmod g+rwxs /data/nfs1
+
+    - name: write in exports file
+      shell: printf "/data/nfs1\t10.240.0.0/16(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
+
+    - name: export the file
+      shell: exportfs -av
+
+    - name: change permissions of shared folder
+      shell: systemctl restart nfs-kernel-server
+
+- name: setup the workers
+  hosts: workers
+  become: yes
+  tasks:
+    - name: Install nfs-common
+      apt:
+        name: nfs-common
+        state: present
+
+- name: Install Helm
+  hosts: controllers
+  become: yes
+  vars:
+    helm_version: 3.10.2
+    helm_url: https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz
+
+  tasks:
+    - name: Download Helm binary
+      get_url:
+        url: "{{ helm_url }}"
+        dest: /tmp/helm.tar.gz
+
+    - name: Extract Helm binary
+      command: tar -xvzf /tmp/helm.tar.gz -C /tmp/
+
+    - name: Install Helm
+      command: mv /tmp/linux-amd64/helm /usr/local/bin/helm

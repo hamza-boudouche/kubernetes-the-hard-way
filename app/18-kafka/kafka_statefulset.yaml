@@ -2,35 +2,51 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: kafka
+  labels:
+    app: kafka-app
 spec:
+  serviceName: kafka-svc
   replicas: 3
   selector:
     matchLabels:
-      app: kafka
-  serviceName: kafka
+      app: kafka-app
   template:
     metadata:
       labels:
-        app: kafka
+        app: kafka-app
     spec:
       containers:
-        - name: kafka
-          image: confluentinc/cp-kafka:5.5.1
+        - name: kafka-container
+          image: doughgle/kafka-kraft
           ports:
             - containerPort: 9092
+            - containerPort: 9093
+          env:
+            - name: REPLICAS
+              value: "3"
+            - name: SERVICE
+              value: kafka-svc
+            - name: NAMESPACE
+              value: default
+            - name: SHARE_DIR
+              value: /mnt/kafka
+            - name: CLUSTER_ID
+              value: oh-sxaDRTcyAr6pFRbXyzA
+            - name: DEFAULT_REPLICATION_FACTOR
+              value: "3"
+            - name: DEFAULT_MIN_INSYNC_REPLICAS
+              value: "2"
           volumeMounts:
-            - name: kafka-data
-              mountPath: /var/lib/kafka
-      volumes:
-        - name: kafka-data
-          persistentVolumeClaim:
-            claimName: kafka-pvc-0
+            - name: data
+              mountPath: /mnt/kafka
   volumeClaimTemplates:
     - metadata:
-        name: kafka-pvc-0
+        name: data
+        annotations:
+          volume.beta.kubernetes.io/storage-class: nfs-client
       spec:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: my-storage-class
+        accessModes:
+          - "ReadWriteMany"
         resources:
           requests:
-            storage: 10Gi
+            storage: "1Gi"

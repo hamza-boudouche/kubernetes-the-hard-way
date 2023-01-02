@@ -25,5 +25,5 @@ destroy_infra:
   #   name: hamza13/sdtd-deployment-env
   #   entrypoint: [""]
   script:
-    - echo destroying infra
+    - echo destroying infra !
     # - ./create.sh

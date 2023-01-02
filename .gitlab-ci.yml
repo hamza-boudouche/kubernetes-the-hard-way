@@ -4,7 +4,7 @@ stages:
 
 workflow:
   rules:
-    - if: $CI_COMMIT_BRANCH == "release"
+    - if: $CI_COMMIT_BRANCH == "main"
 
 provision_infra:
   stage: provision_infrastructure

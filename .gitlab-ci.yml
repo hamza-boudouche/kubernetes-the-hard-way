@@ -32,3 +32,4 @@ destroy_infra:
     - echo destroying infra
     - echo $GCE_CREDENTIALS > adc.json
     - ./cleanup.sh
+# changed

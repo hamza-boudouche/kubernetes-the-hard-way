@@ -8,8 +8,9 @@ workflow:
 
 provision_infra:
   stage: provision_infrastructure
-  rules:
-    - if: $CI_COMMIT_MESSAGE == "provision"
+  only:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /^provision/
   # image:
   #   name: hamza13/sdtd-deployment-env
   #   entrypoint: [""]

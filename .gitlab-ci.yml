@@ -30,4 +30,3 @@ destroy_infra:
     - echo $CI_COMMIT_MESSAGE
     - echo destroying infra !
     # - ./create.sh
-# changed something

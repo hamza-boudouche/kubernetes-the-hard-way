@@ -20,8 +20,9 @@ provision_infra:
 
 destroy_infra:
   stage: destroy_infrastructure
-  # rules:
-  #   - if: $CI_COMMIT_MESSAGE =~ /-destroy$/
+  only:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /^destroy/
   # image:
   #   name: hamza13/sdtd-deployment-env
   #   entrypoint: [""]

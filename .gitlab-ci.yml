@@ -4,18 +4,20 @@ stages:
 
 workflow:
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "main"
 
 provision_infra:
   stage: provision_infrastructure
   only:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^provision/
-  # image:
-  #   name: hamza13/sdtd-deployment-env
-  #   entrypoint: [""]
+  image:
+    name: hamza13/sdtd-deployment-env
+    entrypoint: [""]
   script:
     - echo provisionning infra
+    - echo $GCE_CREDENTIALS > adc.json
+    - cat adc.json
     # - ./create.sh
 
 destroy_infra:
@@ -23,10 +25,10 @@ destroy_infra:
   only:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^destroy/
-  # image:
-  #   name: hamza13/sdtd-deployment-env
-  #   entrypoint: [""]
+  image:
+    name: hamza13/sdtd-deployment-env
+    entrypoint: [""]
   script:
-    - echo $CI_COMMIT_MESSAGE
-    - echo destroying infra !
-    # - ./create.sh
+    - echo destroying infra
+    - echo $GCE_CREDENTIALS > adc.json
+    - ./cleanup.sh

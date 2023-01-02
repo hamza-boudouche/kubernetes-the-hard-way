@@ -25,6 +25,7 @@ destroy_infra:
   #   name: hamza13/sdtd-deployment-env
   #   entrypoint: [""]
   script:
+    - echo $CI_COMMIT_MESSAGE
     - echo destroying infra !
     # - ./create.sh
 # changed something

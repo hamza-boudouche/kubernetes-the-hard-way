@@ -17,8 +17,7 @@ provision_infra:
   script:
     - echo provisionning infra
     - echo $GCE_CREDENTIALS > adc.json
-    - cat adc.json
-    # - ./create.sh
+    - ./create.sh
 
 destroy_infra:
   stage: destroy_infrastructure
@@ -32,4 +31,3 @@ destroy_infra:
     - echo destroying infra
     - echo $GCE_CREDENTIALS > adc.json
     - ./cleanup.sh
-# changed

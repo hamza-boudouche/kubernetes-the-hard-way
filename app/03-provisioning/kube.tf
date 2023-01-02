@@ -44,16 +44,18 @@ variable "gce_ssh_user" {
   default = "root"
 }
 variable "gce_ssh_pub_key_file" {
-  default = "~/.ssh/google_compute_engine.pub"
+  default = "google_compute_engine.pub"
 }
 
 variable "gce_zone" {
   type = string
+  default = "us-central1-a"
 }
 
 // Configure the Google Cloud provider
 provider "google" {
-  credentials = "${file("../adc.json")}"
+  credentials = "${file("adc.json")}"
+  # credentials = "${file("file.txt")}"
 }
 
 resource "google_compute_network" "default" {
@@ -64,7 +66,7 @@ resource "google_compute_network" "default" {
 resource "google_compute_subnetwork" "default" {
   name            = "kubernetes"
   network         = "${google_compute_network.default.name}"
-  ip_cidr_range   = "10.240.0.0/24" // is this random ?
+  ip_cidr_range   = "10.240.0.0/24"
 }
 
 resource "google_compute_firewall" "internal" {
@@ -108,6 +110,7 @@ resource "google_compute_firewall" "external" {
 
 resource "google_compute_address" "default" {
   name = "kubernetes-the-easy-way"
+  region = "us-central1"
 }
 
 resource "google_compute_instance" "controller" {

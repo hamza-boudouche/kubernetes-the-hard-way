@@ -7,3 +7,4 @@
 *.csr
 *.kubeconfig
 *encryption-config.yaml
+*google_compute_engine.pub

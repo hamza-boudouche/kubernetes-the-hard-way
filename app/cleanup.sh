@@ -28,5 +28,22 @@ rm 04-certs/*.pem
 rm 04-certs/*.csr
 
 cd ./03-provisioning
-terraform destroy -var "gce_zone=${GCLOUD_ZONE}" --auto-approve 
+
+# test if TERRAFORM_TOKEN env var is set, if not prompt the user to enter it and then export its value
+if [ -z "$TERRAFORM_TOKEN" ]; then
+  if [ "$GITLAB_CI" = "true" ]; then
+    # Running in a GitLab CI runner
+    echo "You forgot to add the TERRAFORM_TOKEN secret"
+    exit 1
+  else
+    # Not running in a GitLab CI runner
+    # TERRAFORM_TOKEN is not set, prompt the user to enter a value
+    read -p "There is no registered Terraform token, please insert a valid one: " TERRAFORM_TOKEN
+    export TERRAFORM_TOKEN
+  fi
+fi
+
+terraform init -backend-config="token=$TERRAFORM_TOKEN"
+
+terraform destroy --auto-approve 
 cd ..

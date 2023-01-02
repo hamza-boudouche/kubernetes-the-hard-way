@@ -1,3 +1,21 @@
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "4.43.0"
+    }
+  }
+    backend "remote" {
+    hostname     = "app.terraform.io"
+    organization = "hamza-inc"
+
+    workspaces {
+      name = "sdtd"
+    }
+  }
+}
+
+
 resource "google_compute_router" "router" {
   name    = "router"
   region  = "us-central1"

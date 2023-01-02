@@ -6,11 +6,26 @@ export CNI_PLUGINS_VERSION=v0.6.0
 export CONTAINERD_VERSION=1.2.0-rc.0
 
 rm -f /root/.ssh/google_compute_engine*
-# ⚠️ Here we create a key with no passphrase
+# Here we create a key with no passphrase
 ssh-keygen -q -P "" -f /root/.ssh/google_compute_engine
 
 cd /root/app/03-provisioning
-terraform init
+
+# test if TERRAFORM_TOKEN env var is set, if not prompt the user to enter it and then export its value
+if [ -z "$TERRAFORM_TOKEN" ]; then
+  if [ "$GITLAB_CI" = "true" ]; then
+    # Running in a GitLab CI runner
+    echo "You forgot to add the TERRAFORM_TOKEN secret"
+    exit 1
+  else
+    # Not running in a GitLab CI runner
+    # TERRAFORM_TOKEN is not set, prompt the user to enter a value
+    read -p "There is no registered Terraform token, please insert a valid one: " TERRAFORM_TOKEN
+    export TERRAFORM_TOKEN
+  fi
+fi
+
+terraform init -backend-config="token=$TERRAFORM_TOKEN"
 
 terraform apply --auto-approve -var "gce_zone=${GCLOUD_ZONE}"
 

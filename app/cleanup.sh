@@ -1,5 +1,7 @@
 #!/bin/sh
 
+source /root/.bashrc
+
 #destroy web firewall
 gcloud -q compute firewall-rules delete \
   kubernetes-the-easy-way-allow-web || true
@@ -46,4 +48,3 @@ fi
 terraform init -backend-config="token=$TERRAFORM_TOKEN"
 
 terraform destroy --auto-approve 
-cd ..

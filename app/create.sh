@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source ../profile
+source /root/.bashrc
 
 export ETCD_VERSION=v3.3.5
 export CNI_VERSION=0.3.1
@@ -11,7 +11,7 @@ rm -f /root/.ssh/google_compute_engine*
 # Here we create a key with no passphrase
 ssh-keygen -q -P "" -f /root/.ssh/google_compute_engine
 
-cd /root/app/03-provisioning
+cd ./03-provisioning
 
 # test if TERRAFORM_TOKEN env var is set, if not prompt the user to enter it and then export its value
 if [ -z "$TERRAFORM_TOKEN" ]; then
@@ -41,16 +41,16 @@ export bastion_secret_key=$(cat ~/.ssh/google_compute_engine)
 
 scp -o StrictHostKeyChecking=no -i /root/.ssh/google_compute_engine /root/.ssh/google_compute_engine root@$(gcloud compute instances list --filter="(tags.items:bastion)" | grep -v NAME | awk '{ print $5 }'):/root/
 
-cd /root/app/04-certs
+cd ../04-certs
 sh ./gen-certs.sh
 
-cd /root/app/05-kubeconfig
+cd ../05-kubeconfig
 sh ./gen-conf.sh
 
-cd /root/app/06-encryption
+cd ../06-encryption
 sh ./gen-encrypt.sh
 
-cd /root/app
+cd ..
 # 00-ansible/create-inventory.sh
 sh 16-lb/create_private_inventory.sh
 

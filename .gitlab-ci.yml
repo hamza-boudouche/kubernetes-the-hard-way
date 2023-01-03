@@ -18,7 +18,7 @@ provision_infra:
     - echo provisionning infra
     - cd app
     - echo $GCE_CREDENTIALS > adc.json
-    - sh ./create.sh
+    - bash ./create.sh
 
 destroy_infra:
   stage: destroy_infrastructure
@@ -32,4 +32,4 @@ destroy_infra:
     - echo destroying infra
     - cd app
     - echo $GCE_CREDENTIALS > adc.json
-    - sh ./cleanup.sh
+    - bash ./cleanup.sh

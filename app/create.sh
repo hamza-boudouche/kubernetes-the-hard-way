@@ -29,13 +29,13 @@ cp ../adc.json .
 
 cp ~/.ssh/google_compute_engine.pub .
 
+cp ~/.ssh/google_compute_engine .
+
 terraform init -backend-config="token=$TERRAFORM_TOKEN"
 
 terraform apply --auto-approve 
 
 export bastion_secret_key=$(cat ~/.ssh/google_compute_engine)
-
-terraform output bastion_secret_key=bastion_secret_key
 
 scp -o StrictHostKeyChecking=no -i /root/.ssh/google_compute_engine /root/.ssh/google_compute_engine root@$(gcloud compute instances list --filter="(tags.items:bastion)" | grep -v NAME | awk '{ print $5 }'):/root/
 

@@ -55,7 +55,6 @@ variable "gce_zone" {
 // Configure the Google Cloud provider
 provider "google" {
   credentials = "${file("adc.json")}"
-  # credentials = "${file("file.txt")}"
 }
 
 resource "google_compute_network" "default" {
@@ -310,4 +309,8 @@ resource "google_compute_instance" "bastion" {
   }
 
   metadata_startup_script = "apt-get install -y python"
+}
+
+output bastion_private_key {  
+  value = file("./google_compute_engine")
 }

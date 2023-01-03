@@ -18,6 +18,7 @@ provision_infra:
     - echo provisionning infra
     - cd app
     - echo $GCE_CREDENTIALS > adc.json
+    - source /root/.bashrc
     - gcloud compute instances list --filter="(tags.items:bastion)"
     - exit 1
     - bash ./create.sh

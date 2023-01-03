@@ -20,6 +20,8 @@ provision_infra:
     - ls
     - echo $GCE_CREDENTIALS > adc.json
     - echo $GCLOUD_PROJECT
+    - cat /root/.bashrc
+    - ls /root/app
     - gcloud --version
     - sh ./create.sh
 

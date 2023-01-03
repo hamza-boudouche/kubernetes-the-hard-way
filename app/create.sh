@@ -1,5 +1,7 @@
 #!/bin/sh
 
+source ../profile
+
 export ETCD_VERSION=v3.3.5
 export CNI_VERSION=0.3.1
 export CNI_PLUGINS_VERSION=v0.6.0

@@ -2,6 +2,11 @@
 
 source /root/.bashrc
 
+gcloud auth activate-service-account --key-file ./adc.json
+gcloud config set project $GCLOUD_PROJECT
+gcloud config set compute/region $GCLOUD_REGION
+gcloud config set compute/zone $GCLOUD_ZONE
+
 #destroy web firewall
 gcloud -q compute firewall-rules delete \
   kubernetes-the-easy-way-allow-web || true

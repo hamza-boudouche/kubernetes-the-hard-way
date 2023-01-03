@@ -2,6 +2,11 @@
 
 source /root/.bashrc
 
+gcloud auth activate-service-account --key-file ./adc.json
+gcloud config set project $GCLOUD_PROJECT
+gcloud config set compute/region $GCLOUD_REGION
+gcloud config set compute/zone $GCLOUD_ZONE
+
 export ETCD_VERSION=v3.3.5
 export CNI_VERSION=0.3.1
 export CNI_PLUGINS_VERSION=v0.6.0

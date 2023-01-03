@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 kubectl create -f 12-kubedns/kube-dns.yml
 

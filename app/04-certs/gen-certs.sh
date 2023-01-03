@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Generating CA certificate..."
 cfssl gencert -initca ca-csr.json | cfssljson -bare ca

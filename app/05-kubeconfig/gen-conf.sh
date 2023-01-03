@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 KUBERNETES_PUBLIC_ADDRESS=$(gcloud compute addresses describe kubernetes-the-easy-way \
   --region $GCLOUD_REGION \

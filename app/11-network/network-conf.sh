@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #terraform apply 11-network
 for instance in worker-0 worker-1 worker-2; do

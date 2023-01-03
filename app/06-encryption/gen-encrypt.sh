@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Generating encryption-config..."
 ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64)

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 source /root/.bashrc
 
@@ -42,17 +42,17 @@ export bastion_secret_key=$(cat ~/.ssh/google_compute_engine)
 scp -o StrictHostKeyChecking=no -i /root/.ssh/google_compute_engine /root/.ssh/google_compute_engine root@$(gcloud compute instances list --filter="(tags.items:bastion)" | grep -v NAME | awk '{ print $5 }'):/root/
 
 cd ../04-certs
-sh ./gen-certs.sh
+bash ./gen-certs.sh
 
 cd ../05-kubeconfig
-sh ./gen-conf.sh
+bash ./gen-conf.sh
 
 cd ../06-encryption
-sh ./gen-encrypt.sh
+bash ./gen-encrypt.sh
 
 cd ..
 # 00-ansible/create-inventory.sh
-sh 16-lb/create_private_inventory.sh
+bash 16-lb/create_private_inventory.sh
 
 ansible-playbook -i private_inventory.ini 07-etcd/etcd-playbook.yml
 
@@ -81,11 +81,11 @@ gcloud compute forwarding-rules create kubernetes-forwarding-rule \
 
 ansible-playbook -i private_inventory.ini 09-kubelet/kubelet-playbook.yml
 
-sh ./10-kubectl/setup-kubectl.sh
+bash ./10-kubectl/setup-kubectl.sh
 
-sh ./11-network/network-conf.sh
+bash ./11-network/network-conf.sh
 
-sh ./12-kubedns/setup-kubedns.sh
+bash ./12-kubedns/setup-kubedns.sh
 
 ansible-playbook -i private_inventory.ini 15-nfs/nfs-playbook.yml
 

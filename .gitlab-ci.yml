@@ -16,9 +16,9 @@ provision_infra:
     entrypoint: [""]
   script:
     - echo provisionning infra
+    - cd app
     - echo $GCE_CREDENTIALS > adc.json
-    # - ./create.sh
-    - ls
+    - ./create.sh
 
 destroy_infra:
   stage: destroy_infrastructure
@@ -30,5 +30,6 @@ destroy_infra:
     entrypoint: [""]
   script:
     - echo destroying infra
+    - cd app
     - echo $GCE_CREDENTIALS > adc.json
     - ./cleanup.sh

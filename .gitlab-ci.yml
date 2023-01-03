@@ -19,6 +19,7 @@ provision_infra:
     - cd app
     - ls
     - echo $GCE_CREDENTIALS > adc.json
+    - gcloud --version
     - sh ./create.sh
 
 destroy_infra:

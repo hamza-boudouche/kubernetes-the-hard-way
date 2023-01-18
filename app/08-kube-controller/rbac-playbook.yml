@@ -8,6 +8,10 @@
         owner: root
         group: root
         mode: 0744
+    - name: copy admin kube config config
+      copy:
+        src: /root/app/05-kubeconfig/admin.kubeconfig
+        dest: /etc/kubernetes/config/admin.kubeconfig
     - name: waiting for kube to start
       pause:
         seconds: 40

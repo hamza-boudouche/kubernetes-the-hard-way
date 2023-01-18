@@ -1,0 +1,14 @@
+- hosts: controller-0
+  remote_user: root
+  tasks:
+    - name: copy kubedns.yml
+      copy:
+        src: /root/app/12-kubedns/kube-dns.yml
+        dest: /root/kubedns.yml
+    - name: copy setup-kubedns.sh
+      copy:
+        src: /root/app/12-kubedns/setup-kubedns.sh
+        dest: /root/setup-kubedns.sh
+        mode: 0744
+    - name: run kubedns setup
+      command: /root/setup-kubedns.sh

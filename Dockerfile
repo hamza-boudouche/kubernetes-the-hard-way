@@ -4,7 +4,7 @@ FROM python:3.6-alpine
 ENV TERRAFORM_VERSION=1.3.4 \
     GCLOUD_SDK_VERSION=409.0.0 \
     CFSSL_VERSION=R1.2 \
-    KUBE_VERSION=v1.12.2
+    KUBE_VERSION=v1.21.0
 
 # prepare to download necessary files to install gcloud cli and terraform
 ENV GCLOUD_SDK_FILE=google-cloud-sdk-${GCLOUD_SDK_VERSION}-linux-x86_64.tar.gz \

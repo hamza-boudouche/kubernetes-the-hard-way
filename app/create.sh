@@ -7,10 +7,10 @@ gcloud config set project $GCLOUD_PROJECT
 gcloud config set compute/region $GCLOUD_REGION
 gcloud config set compute/zone $GCLOUD_ZONE
 
-export ETCD_VERSION=v3.3.5
+export ETCD_VERSION=v3.4.15
 export CNI_VERSION=0.3.1
-export CNI_PLUGINS_VERSION=v0.6.0
-export CONTAINERD_VERSION=1.2.0-rc.0
+export CNI_PLUGINS_VERSION=v0.9.1
+export CONTAINERD_VERSION=1.4.4
 
 rm -f /root/.ssh/google_compute_engine*
 # Here we create a key with no passphrase
@@ -86,11 +86,15 @@ gcloud compute forwarding-rules create kubernetes-forwarding-rule \
 
 ansible-playbook -i private_inventory.ini 09-kubelet/kubelet-playbook.yml
 
-bash ./10-kubectl/setup-kubectl.sh
+# bash ./10-kubectl/setup-kubectl.sh
+
+ansible-playbook -i private_inventory.ini ./10-kubectl/setup-kubectl.yml
 
 bash ./11-network/network-conf.sh
 
-bash ./12-kubedns/setup-kubedns.sh
+# bash ./12-kubedns/setup-kubedns.sh
+
+ansible-playbook -i private_inventory.ini ./12-kubedns/setup-kubedns.yml
 
 ansible-playbook -i private_inventory.ini 15-nfs/nfs-playbook.yml
 

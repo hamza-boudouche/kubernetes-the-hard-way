@@ -86,14 +86,17 @@ KUBERNETES_PUBLIC_ADDRESS=$(gcloud compute addresses describe kubernetes-the-eas
   --region $(gcloud config get-value compute/region) \
   --format 'value(address)')
 
+KUBERNETES_HOSTNAMES=kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
+
 echo "Generating kubernetes certificate..."
 cfssl gencert \
   -ca=ca.pem \
   -ca-key=ca-key.pem \
   -config=ca-config.json \
-  -hostname=10.32.0.1,10.240.0.10,10.240.0.11,10.240.0.12,${KUBERNETES_PUBLIC_ADDRESS},127.0.0.1,kubernetes.default \
+  -hostname=10.32.0.1,10.240.0.10,10.240.0.11,10.240.0.12,${KUBERNETES_PUBLIC_ADDRESS},127.0.0.1,${KUBERNETES_HOSTNAMES} \
   -profile=kubernetes \
   kubernetes-csr.json | cfssljson -bare kubernetes
+
 
 if [ ! -f kubernetes-key.pem ]||[ ! -f kubernetes.pem ]; then
     echo "Error creating kubernetes certificates"
@@ -113,23 +116,23 @@ if [ ! -f service-account-key.pem ]||[ ! -f service-account.pem ]; then
     exit -1
 fi
 
-echo "Generating front-proxy ca certificate..."
-cfssl gencert -initca ca-front-proxy-csr.json | cfssljson -bare ca-front-proxy
+# echo "Generating front-proxy ca certificate..."
+# cfssl gencert -initca ca-front-proxy-csr.json | cfssljson -bare ca-front-proxy
 
-if [ ! -f ca-front-proxy-key.pem ]||[ ! -f ca-front-proxy.pem ]; then
-    echo "Error creating front-proxy CA certificates"
-    exit -1
-fi
+# if [ ! -f ca-front-proxy-key.pem ]||[ ! -f ca-front-proxy.pem ]; then
+#     echo "Error creating front-proxy CA certificates"
+#     exit -1
+# fi
 
-echo "Generating front-proxy-client certificate..."
-cfssl gencert \
-  -ca=ca-front-proxy.pem \
-  -ca-key=ca-front-proxy-key.pem \
-  -config=ca-front-proxy-config.json \
-  -profile=kubernetes \
-  front-proxy-client-csr.json | cfssljson -bare front-proxy-client
+# echo "Generating front-proxy-client certificate..."
+# cfssl gencert \
+#   -ca=ca-front-proxy.pem \
+#   -ca-key=ca-front-proxy-key.pem \
+#   -config=ca-front-proxy-config.json \
+#   -profile=kubernetes \
+#   front-proxy-client-csr.json | cfssljson -bare front-proxy-client
 
-if [ ! -f front-proxy-client.pem ]||[ ! -f front-proxy-client.pem ]; then
-    echo "Error creating front-proxy-client certificates"
-    exit -1
-fi
+# if [ ! -f front-proxy-client.pem ]||[ ! -f front-proxy-client.pem ]; then
+#     echo "Error creating front-proxy-client certificates"
+#     exit -1
+# fi

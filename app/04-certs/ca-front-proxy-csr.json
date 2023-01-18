@@ -7,10 +7,10 @@
   "names": [
     {
       "C": "FR",
-      "L": "Nantes",
-      "O": "front-proxy-ca",
-      "O": "Kubernetes",
-      "ST": "Loire-Atlantique"
+      "L": "Grenoble",
+      "O": "SDTD",
+      "OU": "Kubernetes",
+      "ST": "France"
     }
   ]
 }

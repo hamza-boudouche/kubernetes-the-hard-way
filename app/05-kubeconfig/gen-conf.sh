@@ -1,8 +1,11 @@
 #!/bin/bash
 
-KUBERNETES_PUBLIC_ADDRESS=$(gcloud compute addresses describe kubernetes-the-easy-way \
-  --region $GCLOUD_REGION \
-  --format 'value(address)')
+# KUBERNETES_PUBLIC_ADDRESS=$(gcloud compute addresses describe kubernetes-the-easy-way \
+#   --region $GCLOUD_REGION \
+#   --format 'value(address)')
+
+KUBERNETES_PUBLIC_ADDRESS=10.240.0.10
+
 echo "Kubernetes public address: ${KUBERNETES_PUBLIC_ADDRESS}"
 
 for instance in worker-0 worker-1 worker-2; do

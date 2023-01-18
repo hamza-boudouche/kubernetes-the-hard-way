@@ -5,9 +5,9 @@ POD_CIDR=$(curl -s -H "Metadata-Flavor: Google" \
 
 HOSTNAME=$(hostname -s)
 
-cat > /etc/cni/net.d/10-bridge.conf <<EOF
+cat <<EOF | sudo tee /etc/cni/net.d/10-bridge.conf
 {
-    "cniVersion": "0.3.1",
+    "cniVersion": "0.4.0",
     "name": "bridge",
     "type": "bridge",
     "bridge": "cnio0",
@@ -23,14 +23,15 @@ cat > /etc/cni/net.d/10-bridge.conf <<EOF
 }
 EOF
 
-cat > /etc/cni/net.d/99-loopback.conf <<EOF
+cat <<EOF | sudo tee /etc/cni/net.d/99-loopback.conf
 {
-    "cniVersion": "0.3.1",
+    "cniVersion": "0.4.0",
+    "name": "lo",
     "type": "loopback"
 }
 EOF
 
-cat > /etc/containerd/config.toml <<EOF
+cat << EOF | sudo tee /etc/containerd/config.toml
 [plugins]
   [plugins.cri.containerd]
     snapshotter = "overlayfs"
@@ -38,13 +39,9 @@ cat > /etc/containerd/config.toml <<EOF
       runtime_type = "io.containerd.runtime.v1.linux"
       runtime_engine = "/usr/local/bin/runc"
       runtime_root = ""
-    [plugins.cri.containerd.untrusted_workload_runtime]
-      runtime_type = "io.containerd.runtime.v1.linux"
-      runtime_engine = "/usr/local/bin/runsc"
-      runtime_root = "/run/containerd/runsc"
 EOF
 
-cat > /etc/systemd/system/containerd.service <<EOF
+cat <<EOF | sudo tee /etc/systemd/system/containerd.service
 [Unit]
 Description=containerd container runtime
 Documentation=https://containerd.io
@@ -66,7 +63,7 @@ LimitCORE=infinity
 WantedBy=multi-user.target
 EOF
 
-cat > /etc/systemd/system/kubelet.service <<EOF
+cat <<EOF | sudo tee /etc/systemd/system/kubelet.service
 [Unit]
 Description=Kubernetes Kubelet
 Documentation=https://github.com/kubernetes/kubernetes
@@ -90,7 +87,7 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-cat > /var/lib/kubelet/kubelet-config.yaml <<EOF
+cat <<EOF | sudo tee /var/lib/kubelet/kubelet-config.yaml
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 authentication:
@@ -106,12 +103,13 @@ clusterDomain: "cluster.local"
 clusterDNS:
   - "10.32.0.10"
 podCIDR: "${POD_CIDR}"
+resolvConf: "/run/systemd/resolve/resolv.conf"
 runtimeRequestTimeout: "15m"
 tlsCertFile: "/var/lib/kubelet/${HOSTNAME}.pem"
 tlsPrivateKeyFile: "/var/lib/kubelet/${HOSTNAME}-key.pem"
 EOF
 
-cat > /etc/systemd/system/kube-proxy.service <<EOF
+cat <<EOF | sudo tee /etc/systemd/system/kube-proxy.service
 [Unit]
 Description=Kubernetes Kube Proxy
 Documentation=https://github.com/kubernetes/kubernetes
@@ -126,7 +124,7 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-cat > /var/lib/kube-proxy/kube-proxy-config.yaml <<EOF
+cat <<EOF | sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml
 kind: KubeProxyConfiguration
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 clientConnection:

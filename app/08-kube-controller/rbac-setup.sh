@@ -1,7 +1,7 @@
 #!/bin/sh
 
-cat <<EOF | kubectl apply -f -
-apiVersion: rbac.authorization.k8s.io/v1beta1
+cat <<EOF | kubectl apply --kubeconfig /etc/kubernetes/config/admin.kubeconfig -f -
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
@@ -22,8 +22,8 @@ rules:
       - "*"
 EOF
 
-cat <<EOF | kubectl apply -f -
-apiVersion: rbac.authorization.k8s.io/v1beta1
+cat <<EOF | kubectl apply --kubeconfig /etc/kubernetes/config/admin.kubeconfig -f -
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: system:kube-apiserver

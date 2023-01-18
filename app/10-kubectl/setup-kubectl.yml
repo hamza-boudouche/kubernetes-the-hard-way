@@ -1,0 +1,22 @@
+- hosts: controllers
+  remote_user: root
+  tasks:
+    - name: copy ca cert
+      copy:
+        src: /root/app/04-certs/ca.pem
+        dest: /var/lib/kubernetes/ca.pem
+    - name: copy ca admin cert
+      copy:
+        src: /root/app/04-certs/admin.pem
+        dest: /var/lib/kubernetes/admin.pem
+    - name: copy ca admin key
+      copy:
+        src: /root/app/04-certs/admin-key.pem
+        dest: /var/lib/kubernetes/admin-key.pem
+    - name: copy setup-kubectl.sh
+      copy:
+        src: /root/app/10-kubectl/setup-kubectl.sh
+        dest: /root/setup-kubectl.sh
+        mode: 0744
+    - name: run kubectl setup
+      command: /root/setup-kubectl.sh

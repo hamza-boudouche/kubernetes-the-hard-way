@@ -7,10 +7,10 @@
   "names": [
     {
       "C": "FR",
-      "L": "Nantes",
-      "O": "system:node-proxier",
+      "L": "Grenoble",
+      "O": "system:masters",
       "OU": "Kubernetes The Easy Way",
-      "ST": "Loire-Atlantique"
+      "ST": "France"
     }
   ]
 }

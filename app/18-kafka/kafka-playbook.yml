@@ -1,0 +1,120 @@
+- hosts: kafka
+  remote_user: root
+  tasks:
+    - name: install jdk
+      shell: apt install -y default-jdk
+
+    - name: disable swap
+      shell: swapoff -a
+
+    - name: make swap disabling permanent
+      shell: sed -i '/ swap / s/^/#/' /etc/fstab
+
+    - name: install jdk
+      shell: wget https://archive.apache.org/dist/kafka/2.4.1/kafka_2.13-2.4.1.tgz -P /root
+
+    - name: install jdk
+      shell: tar -xvf /root/kafka_2.13-2.4.1.tgz
+
+    - name: install jdk
+      shell: mv kafka_2.13-2.4.1 /tmp/kafka; return 0
+
+    - name: install jdk
+      shell: mkdir /tmp/kafka/kafka; return 0
+
+    - name: configure seeds
+      shell: mkdir /tmp/kafka/zookeeper; return 0
+
+    - name: configure listen address
+      shell: "echo {{ groups['kafka'].index(inventory_hostname) + 1 }} > /tmp/kafka/zookeeper/myid"
+
+    - name: add kafka conf
+      shell: "echo advertised.listeners=PLAINTEXT://{{ hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[2] }}:9092 >> /tmp/kafka/config/server.properties"
+
+    - name: kafka conf
+      shell: echo delete.topic.enable=true >> /tmp/kafka/config/server.properties
+
+    - name: kafka conf
+      shell: echo default.replication.factor=3 >> /tmp/kafka/config/server.properties
+
+    - name: kafka conf
+      shell: echo min.insync.replicas=2 >> /tmp/kafka/config/server.properties
+
+    - name: kafka conf
+      shell: "sed -i 's/broker.id=0/broker.id={{ groups['kafka'].index(inventory_hostname) + 1 }}/g' /tmp/kafka/config/server.properties"
+
+    - name: kafka conf
+      shell: sed -i 's_log.dirs=/tmp/kafka-logs_log.dirs=/kafka_g' /tmp/kafka/config/server.properties
+
+    - name: kafka conf
+      shell: sed -i 's_num.partitions=1_num.partitions=8_g' /tmp/kafka/config/server.properties
+
+    - name: kafka conf
+      shell: sed -i 's/zookeeper.connect=localhost:2181/zookeeper.connect=10.240.0.80:2181,10.240.0.81:2181,10.240.0.82:2181/g' /tmp/kafka/config/server.properties
+
+    - name: zk conf
+      shell: echo tickTime=2000 >> /tmp/kafka/config/zookeeper.properties
+
+    - name: zk conf
+      shell: echo initLimit=10 >> /tmp/kafka/config/zookeeper.properties
+
+    - name: zk conf
+      shell: echo syncLimit=5 >> /tmp/kafka/config/zookeeper.properties
+
+    - name: zk conf
+      shell: echo server.1=10.240.0.80:2888:3888 >> /tmp/kafka/config/zookeeper.properties
+
+    - name: zk conf
+      shell: echo server.2=10.240.0.81:2888:3888 >> /tmp/kafka/config/zookeeper.properties
+
+    - name: zk conf
+      shell: echo server.3=10.240.0.82:2888:3888 >> /tmp/kafka/config/zookeeper.properties
+
+    - name: zk conf
+      shell: sed -i 's_dataDir=/tmp/zookeeper_dataDir=/zookeeper_g' /tmp/kafka/config/server.properties
+
+    - name: copy generate init.d kafka
+      copy:
+        src: /root/app/18-kafka/kafka
+        dest: /etc/init.d/kafka
+        owner: root
+        group: root
+        mode: 0744
+
+    - name: give perms to zookeeper properties file
+      shell: chmod 700 /tmp/kafka/config/zookeeper.properties
+
+    - name: generate init.d kafka
+      shell: chmod +x /etc/init.d/kafka
+
+    - name: generate init.d kafka
+      shell: chown root:root /etc/init.d/kafka
+
+    - name: generate init.d kafka
+      shell: update-rc.d kafka defaults
+
+    - name: generate init.d kafka
+      shell: service kafka start
+
+    - name: copy generate init.d zk
+      copy:
+        src: /root/app/18-kafka/zookeeper
+        dest: /etc/init.d/zookeeper
+        owner: root
+        group: root
+        mode: 0744
+
+    - name: give perms to zookeeper properties file
+      shell: chmod 700 /tmp/kafka/config/zookeeper.properties
+
+    - name: generate init.d zk
+      shell: chmod +x /etc/init.d/zookeeper
+
+    - name: generate init.d zk
+      shell: chown root:root /etc/init.d/zookeeper
+
+    - name: generate init.d zk
+      shell: update-rc.d zookeeper defaults
+
+    - name: generate init.d zk
+      shell: service zookeeper start

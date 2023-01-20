@@ -105,3 +105,7 @@ ansible-playbook -i private_inventory.ini 16-lb/lb-playbook.yml
 export nfs_server_ip=$(gcloud compute instances list --filter="(tags.items:nfs)" | grep -v NAME | awk '{ print $4 }')
 
 ansible-playbook -i private_inventory.ini 17-storageclass/storageclass-playbook.yml
+
+ansible-playbook -i private_inventory.ini ./19-cassandra/cassandra-playbook.yml
+
+ansible-playbook -i private_inventory.ini ./18-kafka/kafka-playbook.yml

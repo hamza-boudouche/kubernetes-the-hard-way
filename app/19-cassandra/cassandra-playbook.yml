@@ -1,0 +1,35 @@
+- hosts: cassandra
+  remote_user: root
+  tasks:
+    - name: install jdk
+      shell: apt install openjdk-11-jdk
+
+    - name: install jdk
+      shell: echo "deb http://www.apache.org/dist/cassandra/debian 40x main" |  sudo tee /etc/apt/sources.list.d/cassandra.list
+
+    - name: install jdk
+      shell: curl https://downloads.apache.org/cassandra/KEYS | sudo apt-key add -
+
+    - name: install jdk
+      shell: apt update
+
+    - name: install jdk
+      shell: apt install cassandra
+
+    - name: install jdk
+      shell: systemctl enable cassandra
+
+    - name: install jdk
+      shell: systemctl start cassandra
+
+    - name: configure seeds
+      shell: sed -i 's/127.0.0.1:7000/10.240.0.70,10.240.0.71,10.240.0.72/g' /etc/cassandra/cassandra.yaml
+
+    - name: configure listen address
+      shell: "sed -i 's/listen_address: localhost/listen_address: {{ hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[2] }}/g' /etc/cassandra/cassandra.yaml"
+
+    - name: configure rpc address
+      shell: "sed -i 's/rpc_address: localhost/rpc_address: {{ hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[2] }}/g' /etc/cassandra/cassandra.yaml"
+
+    - name: restart cassandra
+      shell: systemctl restart cassandra

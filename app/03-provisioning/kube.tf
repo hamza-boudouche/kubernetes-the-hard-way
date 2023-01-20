@@ -101,7 +101,7 @@ resource "google_compute_firewall" "external" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "6443"]
+    ports    = ["22", "6443", "80", "443"]
   }
 
   source_ranges = [ "0.0.0.0/0" ]
@@ -255,6 +255,88 @@ resource "google_compute_instance" "nfs" {
   network_interface {
     subnetwork = "${google_compute_subnetwork.default.name}"
     network_ip = "10.240.0.4"
+
+    # access_config {
+    #   // Ephemeral IP
+    # }
+  }
+  
+  service_account {
+    scopes = ["compute-rw","storage-ro","service-management","service-control","logging-write","monitoring"]
+  }
+
+  metadata = {
+    sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
+  }
+
+  metadata_startup_script = "apt-get install -y python"
+}
+
+resource "google_compute_instance" "cassandra" {
+  count = 3
+  name            = "cassandra-${count.index}"
+  machine_type    = "n1-standard-1"
+  zone            = "${var.gce_zone}"
+  can_ip_forward  = true
+
+  tags = ["kubernetes-the-easy-way","cassandra"]
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-1804-lts"
+      size = 500
+    }
+  }
+
+  // Local SSD disk
+  scratch_disk {
+    interface = "SCSI"
+  }
+
+  network_interface {
+    subnetwork = "${google_compute_subnetwork.default.name}"
+    network_ip = "10.240.0.7${count.index}"
+
+    # access_config {
+    #   // Ephemeral IP
+    # }
+  }
+  
+  service_account {
+    scopes = ["compute-rw","storage-ro","service-management","service-control","logging-write","monitoring"]
+  }
+
+  metadata = {
+    sshKeys = "${var.gce_ssh_user}:${file(var.gce_ssh_pub_key_file)}"
+  }
+
+  metadata_startup_script = "apt-get install -y python"
+}
+
+resource "google_compute_instance" "kafka" {
+  count = 3
+  name            = "kafka-${count.index}"
+  machine_type    = "n1-standard-1"
+  zone            = "${var.gce_zone}"
+  can_ip_forward  = true
+
+  tags = ["kubernetes-the-easy-way","kafka"]
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-1804-lts"
+      size = 500
+    }
+  }
+
+  // Local SSD disk
+  scratch_disk {
+    interface = "SCSI"
+  }
+
+  network_interface {
+    subnetwork = "${google_compute_subnetwork.default.name}"
+    network_ip = "10.240.0.8${count.index}"
 
     # access_config {
     #   // Ephemeral IP

@@ -11,9 +11,12 @@ http {
 		server {
 				{% for service, port in port_config.items() %}
 				location /{{ service }} {
-						proxy_pass http://{{ service }};
+						proxy_pass http://{{ service }}/;
 				}
 				{% endfor %}
+				location / {
+						proxy_pass http://prometheus-service/;
+				}
 		}
 }
 

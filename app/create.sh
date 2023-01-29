@@ -98,7 +98,7 @@ ansible-playbook -i private_inventory.ini ./12-kubedns/setup-kubedns.yml
 
 ansible-playbook -i private_inventory.ini 15-nfs/nfs-playbook.yml
 
-python 16-lb/render_conf.py > 16-lb/nginx.conf
+# python 16-lb/render_conf.py > 16-lb/nginx.conf
 
 ansible-playbook -i private_inventory.ini 16-lb/lb-playbook.yml
 
@@ -108,4 +108,10 @@ ansible-playbook -i private_inventory.ini 17-storageclass/storageclass-playbook.
 
 ansible-playbook -i private_inventory.ini ./19-cassandra/cassandra-playbook.yml
 
-ansible-playbook -i private_inventory.ini ./18-kafka/kafka-playbook.yml
+# ansible-playbook -i private_inventory.ini ./18-kafka/kafka-playbook.yml
+
+ansible-playbook -i private_inventory.ini 20-prometheus/prometheus-playbook.yml
+
+ansible-playbook -i private_inventory.ini 20-prometheus/node-exporter-playbook.yml
+
+ansible-playbook -i private_inventory.ini 20-prometheus/grafana-playbook.yml

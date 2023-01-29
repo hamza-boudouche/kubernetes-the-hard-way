@@ -1,0 +1,101 @@
+- name: deploy grafana
+  hosts: controller-0
+  become: yes
+  tasks:
+    - name: Create Grafana Datasource Config file
+      copy:
+        dest: "./grafana-datasource-config.yaml"
+        content: |
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: grafana-datasources
+            namespace: monitoring
+          data:
+            prometheus.yaml: |-
+              {
+                  "apiVersion": 1,
+                  "datasources": [
+                      {
+                        "access":"proxy",
+                          "editable": true,
+                          "name": "prometheus",
+                          "orgId": 1,
+                          "type": "prometheus",
+                          "url": "http://10.240.0.20:30000",
+                          "version": 1
+                      }
+                  ]
+              }
+    - name: Apply the Grafana Datasource Config file
+      shell: kubectl apply -f grafana-datasource-config.yaml
+    - name: Create Grafana Deployment file
+      copy:
+        dest: "./deployment.yaml"
+        content: |
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: grafana
+            namespace: monitoring
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: grafana
+            template:
+              metadata:
+                name: grafana
+                labels:
+                  app: grafana
+              spec:
+                containers:
+                - name: grafana
+                  image: grafana/grafana:latest
+                  ports:
+                  - name: grafana
+                    containerPort: 3000
+                  resources:
+                    limits:
+                      memory: "1Gi"
+                      cpu: "1000m"
+                    requests: 
+                      memory: 500M
+                      cpu: "500m"
+                  volumeMounts:
+                    - mountPath: /var/lib/grafana
+                      name: grafana-storage
+                    - mountPath: /etc/grafana/provisioning/datasources
+                      name: grafana-datasources
+                      readOnly: false
+                volumes:
+                  - name: grafana-storage
+                    emptyDir: {}
+                  - name: grafana-datasources
+                    configMap:
+                        defaultMode: 420
+                        name: grafana-datasources
+    - name: Apply Grafana Deployment file
+      shell: kubectl apply -f deployment.yaml
+    - name: Create Grafana Service file
+      copy:
+        dest: "./service-grafana.yaml"
+        content: |
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: grafana
+            namespace: monitoring
+            annotations:
+                prometheus.io/scrape: 'true'
+                prometheus.io/port:   '3000'
+          spec:
+            selector: 
+              app: grafana
+            type: NodePort  
+            ports:
+              - port: 3000
+                targetPort: 3000
+                nodePort: 32000
+    - name: Apply Grafana Service file
+      shell: kubectl apply -f service-grafana.yaml

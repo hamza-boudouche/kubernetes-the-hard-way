@@ -33,3 +33,14 @@
 
     - name: restart cassandra
       shell: systemctl restart cassandra
+
+    - name: copy db config file
+      copy:
+        src: /root/app/19-cassandra/init.cql
+        dest: /root/init.cql
+        owner: root
+        group: root
+        mode: 0744
+
+    - name: init cassandra
+      shell: cqlsh -f /root/init.cql

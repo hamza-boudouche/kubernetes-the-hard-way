@@ -15,7 +15,8 @@ http {
 				}
 				{% endfor %}
 				location / {
-						proxy_pass http://prometheus-service/;
+						proxy_set_header Host $http_host;
+						proxy_pass http://grafana/;
 				}
 		}
 }

@@ -79,9 +79,6 @@
                   - targets:
                     - "alertmanager.monitoring.svc:9093"
               scrape_configs:
-                - job_name: 'kube-state-metrics'
-                  static_configs:
-                    - targets: ['kube-state-metrics.kube-system.svc.cluster.local:8080']
                 - job_name: 'node-exporter'
                   kubernetes_sd_configs:
                     - role: endpoints
@@ -98,15 +95,15 @@
                     regex: true
                   - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
                     action: replace
-                    target_label: __metrics_path__
+                    target_label: _metrics_path_
                     regex: (.+)
-                  - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+                  - source_labels: [_address_, __meta_kubernetes_pod_annotation_prometheus_io_port]
                     action: replace
                     regex: ([^:]+)(?::\d+)?;(\d+)
                     replacement: $1:$2
-                    target_label: __address__
+                    target_label: _address_
                   - action: labelmap
-                    regex: __meta_kubernetes_pod_label_(.+)
+                    regex: _meta_kubernetes_pod_label(.+)
                   - source_labels: [__meta_kubernetes_namespace]
                     action: replace
                     target_label: kubernetes_namespace
@@ -122,12 +119,12 @@
                   - role: node
                   relabel_configs:
                   - action: labelmap
-                    regex: __meta_kubernetes_node_label_(.+)
-                  - target_label: __address__
+                    regex: _meta_kubernetes_node_label(.+)
+                  - target_label: _address_
                     replacement: 10.240.0.10:6443
                   - source_labels: [__meta_kubernetes_node_name]
                     regex: (.+)
-                    target_label: __metrics_path__
+                    target_label: _metrics_path_
                     replacement: /api/v1/nodes/${1}/proxy/metrics
     - name: Apply ConfigMap file
       shell: kubectl apply -f config-map.yaml

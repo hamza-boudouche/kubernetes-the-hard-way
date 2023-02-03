@@ -1,25 +1,34 @@
 - hosts: cassandra
   remote_user: root
   tasks:
-    - name: install jdk
-      shell: apt install openjdk-11-jdk
+    - name: update cache
+      apt:
+        update_cache: yes
 
-    - name: install jdk
+    - name: install Java 11
+      become: yes
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+
+    - name: config cassandra 
       shell: echo "deb http://www.apache.org/dist/cassandra/debian 40x main" |  sudo tee /etc/apt/sources.list.d/cassandra.list
 
-    - name: install jdk
+    - name: get cassandra keys
       shell: curl https://downloads.apache.org/cassandra/KEYS | sudo apt-key add -
 
-    - name: install jdk
+    - name: apt update
       shell: apt update
 
-    - name: install jdk
+    - name: install cassandra
       shell: apt install cassandra
 
-    - name: install jdk
+    - name: enable cassandra service
       shell: systemctl enable cassandra
 
-    - name: install jdk
+    - name: start cassandra service
       shell: systemctl start cassandra
 
     - name: configure seeds
@@ -42,5 +51,15 @@
         group: root
         mode: 0744
 
+- hosts: cassandra-0
+  remote_user: root
+  tasks:
+    - name: copy db config file
+        copy:
+          src: /root/app/19-cassandra/init.cql
+          dest: /root/init.cql
+          owner: root
+          group: root
+          mode: 0744
     - name: init cassandra
-      shell: cqlsh -f /root/init.cql
+      shell: cqlsh 10.240.0.70 -f /root/init.cql

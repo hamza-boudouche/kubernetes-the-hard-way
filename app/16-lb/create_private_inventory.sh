@@ -17,8 +17,8 @@ $(gcloud compute instances list --filter="(tags.items:loadbalancer)" | grep -v N
 $(gcloud compute instances list --filter="(tags.items:nfs)" | grep -v NAME | awk '{ print $4 }')
 [cassandra]
 $(gcloud compute instances list --filter="(tags.items:cassandra)" | grep -v NAME | awk '{ print $4 }')
-[kafka]
-$(gcloud compute instances list --filter="(tags.items:kafka)" | grep -v NAME | awk '{ print $4 }')
+[cassandra-0]
+$(gcloud compute instances list --filter="(name:cassandra-0)" | grep -v NAME | awk '{ print $4 }')
 [all:vars]
 ansible_ssh_common_args='-o ProxyCommand="ssh -o StrictHostKeyChecking=no -i /root/.ssh/google_compute_engine -W %h:%p -q root@$(gcloud compute instances list --filter="(tags.items:bastion)" | grep -v NAME | awk '{ print $5 }')"'
 EOF

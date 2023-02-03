@@ -1,0 +1,16 @@
+- name: deploy grafana
+  hosts: controller-0
+  become: yes
+  tasks:
+    - name: add bitnami helm chart
+      shell: helm repo add bitnami https://charts.bitnami.com/bitnami
+    - name: helm install kefka
+      shell: helm install my-release bitnami/kafka
+    - name: apply app-deployment file
+      shell: kubectl apply -f https://raw.githubusercontent.com/Yeyvo/TAG-Visualization/main/deployment/app-deployment.yaml
+    - name: apply app-service file
+      shell: kubectl apply -f https://raw.githubusercontent.com/Yeyvo/TAG-Visualization/main/deployment/app-service.yaml
+    - name: apply consumer-deployment file
+      shell: kubectl apply -f https://raw.githubusercontent.com/Yeyvo/TAG-Visualization/main/deployment/consumer-deployment.yaml
+    - name: apply producer-deployment file
+      shell: kubectl apply -f https://raw.githubusercontent.com/Yeyvo/TAG-Visualization/main/deployment/producer-deployment.yaml

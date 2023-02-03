@@ -110,6 +110,8 @@ ansible-playbook -i private_inventory.ini ./19-cassandra/cassandra-playbook.yml
 
 # ansible-playbook -i private_inventory.ini ./18-kafka/kafka-playbook.yml
 
+ansible-playbook -i private_inventory.ini 21-application/app.yml
+
 ansible-playbook -i private_inventory.ini 20-prometheus/prometheus-playbook.yml
 
 ansible-playbook -i private_inventory.ini 20-prometheus/node-exporter-playbook.yml
